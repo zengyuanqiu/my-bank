@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+	<style>
+      *{
+         margin:0;
+         padding:0;
+      }
+		#warp{
+         position: relative;
+         width: 800px;
+			margin:300px auto;
+		}
+      #warp div{
+         position: absolute;
+         width: 60px;
+         background: red;
+      }
+	</style>
+<body>
+	<div id="warp"></div>
+	<script>
+	var oBox = document.getElementById("warp");
+   var arr = [3, 1, 5, 7, 2, 4, 9, 6, 10, 8];
+   var dom = [];
+   arr.sort(function(){return Math.random() - .5});
+	function run(el, target, attr, fn) {
+      clearTimeout(el.timer)
+      var iStop = false;
+      (function recurs() {
+         el.timer = setTimeout(function() {
+            var cur = parseInt(el.style[attr])
+               ,iSpeed = (target - cur) / 8
+               ,iSpeed = iSpeed > 0 ? Math.ceil(iSpeed) : Math.floor(iSpeed)
+               ,iStop = cur === target
+            el.style[attr] = cur + iSpeed + 'px'
+               if(iStop) {
+                  clearTimeout(el.timer)
+                  fn && fn()
+               }else{
+                  recurs()
+               }
+         }, 30);
+      })()
+   };
+   void function() {
+      for(var i=0; i<arr.length; i++) {
+         var divs = document.createElement('div')
+         divs.style.cssText = `height:${arr[i]*10}px;bottom:0;left:${i*70}px`
+         dom.push(divs)
+         oBox.appendChild(divs)
+      }
+   }();
+   (function recurs(m, n) {
+      if(arr[m] > arr[m+1]) {
+         var temp = arr[m]
+         arr[m] = arr[m+1]
+         arr[m+1] = temp
+         run(dom[m], 100, 'bottom', function() {
+            run(dom[m], (m+1)*70, 'left', function() {
+               run(dom[m], 0, 'bottom', function() {
+                  dom.splice(m,1,...dom.splice(m+1,1,dom[m]))
+                  recurs(m===arr.length-1?0:m+1, m===arr.length-1?n+1:n)
+               })
+               run(dom[m+1], m*70, 'left')
+            })
+         })
+      }else {
+         if(arr.join('') === '12345678910') return
+         recurs(m===arr.length-1?0:m+1, m===arr.length-1?n+1:n)
+      }
+   })(0, 0)
+	</script>
+</body>
+</html>
